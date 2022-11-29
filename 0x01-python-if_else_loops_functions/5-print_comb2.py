@@ -1,4 +1,2 @@
 #!/usr/bin/python3
-for num in range(0, 99):
-    print('{:02d}, '.format(num), end='')
-print('99')
+print(", ".join("{0:0>2}".format(i) for i in range(100)))
