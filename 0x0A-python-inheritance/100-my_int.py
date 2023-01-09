@@ -1,7 +1,18 @@
 #!/usr/bin/python3
-class MyInt(int):
-    def __eq__(self, other):
-        return self - other != 0
+"""myInt class"""
 
-    def __ne__(self, other):
-        return self - other == 0
+
+class MyInt(int):
+    """instance of MyInt"""
+
+    def __init__(self, value):
+        """initializes class"""
+        self.value = value
+
+    def __eq__(self, b):
+        """reverse equals to not equals"""
+        return self.value != b
+
+    def __ne__(self, b):
+        """reverses not equals to equals"""
+        return self.value == b
