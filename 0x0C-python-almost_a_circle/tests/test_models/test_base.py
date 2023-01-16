@@ -1,96 +1,140 @@
 #!/usr/bin/python3
 import unittest
-import os.path
 from models.base import Base
-from models.rectangle import Rectangle
 from models.square import Square
-"""tests the Base"""
+import json
+import inspect
+
+'''
+    Creating test cases for the base module
+'''
 
 
-class TestBase(unittest.TestCase):
+class test_base(unittest.TestCase):
+    '''
+        Testing base
+    '''
+    def test_id_none(self):
+        '''
+            Sending no id
+        '''
+        b = Base()
+        self.assertEqual(1, b.id)
 
     def test_id(self):
-        """tests the ids"""
-        Base._Base__nb_objects = 0
-        b1 = Base()
-        b2 = Base()
-        b3 = Base()
-        b4 = Base(12)
-        b5 = Base()
-        self.assertEqual(b1.id, 1)
-        self.assertEqual(b2.id, 2)
-        self.assertEqual(b3.id, 3)
-        self.assertEqual(b4.id, 12)
-        self.assertEqual(b5.id, 4)
+        '''
+            Sending a valid id
+        '''
+        b = Base(50)
+        self.assertEqual(50, b.id)
 
-    def test_dictionary(self):
-        """tests the dictionary"""
-        Base._Base__nb_objects = 0
-        r1 = Rectangle(10, 7, 2, 8)
-        dictionary = r1.to_dictionary()
-        self.assertDictEqual(dictionary,
-                             {'x': 2, 'width': 10,
-                              'id': 1, 'height': 7, 'y': 8})
-        json_dictionary = Base.to_json_string([dictionary])
-        self.assertEqual(json_dictionary, json_dictionary)
-        self.assertEqual(Base.to_json_string(None), "[]")
-        self.assertEqual(Base.to_json_string([]), "[]")
+    def test_id_zero(self):
+        '''
+            Sending an id 0
+        '''
+        b = Base(0)
+        self.assertEqual(0, b.id)
 
-    def test_saveFile(self):
-        """tests the savefile"""
-        Base._Base__nb_objects = 0
-        r1 = Rectangle(10, 7, 2, 8)
-        r2 = Square(4)
-        Rectangle.save_to_file([r1])
-        Square.save_to_file([r2])
-        with open("Rectangle.json", 'r') as f:
-            self.assertTrue(len(f.read()) > 1)
-        with open("Square.json", 'r') as f:
-            self.assertTrue(len(f.read()) > 1)
+    def test_id_negative(self):
+        '''
+            Sending a negative id
+        '''
+        b = Base(-20)
+        self.assertEqual(-20, b.id)
 
-        Rectangle.save_to_file(None)
-        Square.save_to_file(None)
-        with open("Rectangle.json", 'r') as f:
-            self.assertTrue(f.read() == "[]")
-        with open("Square.json", 'r') as f:
-            self.assertTrue(f.read() == "[]")
+    def test_id_string(self):
+        '''
+            Sending an id that is not an int
+        '''
+        b = Base("Betty")
+        self.assertEqual("Betty", b.id)
 
-    def test_fromJson(self):
-        """tests the fromjson"""
-        r_input = [{'id': 89, 'width': 10, 'height': 4}]
-        s_input = [{'id': 89, 'size': 4}]
-        json_list_input = Rectangle.to_json_string(r_input)
-        list_output = Rectangle.from_json_string(json_list_input)
-        self.assertTrue(type(list_output) is list)
-        list_output = Rectangle.from_json_string([])
-        self.assertTrue(list_output == [])
-        list_output = Rectangle.from_json_string(None)
-        self.assertTrue(list_output == [])
-        json_list_input = Square.to_json_string(s_input)
-        list_output = Square.from_json_string(json_list_input)
-        self.assertTrue(type(list_output) is list)
-        list_output = Square.from_json_string([])
-        self.assertTrue(list_output == [])
-        list_output = Square.from_json_string(None)
-        self.assertTrue(list_output == [])
+    def test_id_list(self):
+        '''
+            Sending an id that is not an int
+        '''
+        b = Base([1, 2, 3])
+        self.assertEqual([1, 2, 3], b.id)
 
-    def test_load(self):
-        """tests load"""
-        r1 = Rectangle(10, 7, 2, 8)
-        r2 = Rectangle(2, 4)
-        list_rectangles_input = [r1, r2]
-        Rectangle.save_to_file(list_rectangles_input)
-        list_rectangles_output = Rectangle.load_from_file()
-        for thing in list_rectangles_output:
-            self.assertTrue(type(thing) is Rectangle)
-        s1 = Square(5)
-        s2 = Square(7, 9, 1)
-        list_squares_input = [s1, s2]
-        Square.save_to_file(list_squares_input)
-        list_squares_output = Square.load_from_file()
-        for thing in list_squares_output:
-            self.assertTrue(type(thing) is Square)
+    def test_id_dict(self):
+        '''
+            Sending an id that is not an int
+        '''
+        b = Base({"id": 109})
+        self.assertEqual({"id": 109}, b.id)
+
+    def test_id_tuple(self):
+        '''
+            Sending an id that is not an int
+        '''
+        b = Base((8,))
+        self.assertEqual((8,), b.id)
+
+    def test_to_json_type(self):
+        '''
+            Testing the json string
+        '''
+        sq = Square(1)
+        json_dict = sq.to_dictionary()
+        json_string = Base.to_json_string([json_dict])
+        self.assertEqual(type(json_string), str)
+
+    def test_to_json_value(self):
+        '''
+            Testing the json string
+        '''
+        sq = Square(1, 0, 0, 609)
+        json_dict = sq.to_dictionary()
+        json_string = Base.to_json_string([json_dict])
+        self.assertEqual(json.loads(json_string),
+                         [{"id": 609, "y": 0, "size": 1, "x": 0}])
+
+    def test_to_json_None(self):
+        '''
+            Testing the json string
+        '''
+        sq = Square(1, 0, 0, 609)
+        json_dict = sq.to_dictionary()
+        json_string = Base.to_json_string(None)
+        self.assertEqual(json_string, "[]")
+
+    def test_to_json_Empty(self):
+        '''
+            Testing the json string
+        '''
+        sq = Square(1, 0, 0, 609)
+        json_dict = sq.to_dictionary()
+        json_string = Base.to_json_string([])
+        self.assertEqual(json_string, "[]")
 
 
-if __name__ == '__main__':
-    unittest.main()
+class TestSquare(unittest.TestCase):
+    """
+    class for testing Base class' methods
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the doc tests
+        """
+        cls.setup = inspect.getmembers(Base, inspect.isfunction)
+
+    def test_module_docstring(self):
+        """
+        Tests if module docstring documentation exist
+        """
+        self.assertTrue(len(Base.__doc__) >= 1)
+
+    def test_class_docstring(self):
+        """
+        Tests if class docstring documentation exist
+        """
+        self.assertTrue(len(Base.__doc__) >= 1)
+
+    def test_func_docstrings(self):
+        """
+        Tests if methods docstring documntation exist
+        """
+        for func in self.setup:
+            self.assertTrue(len(func[1].__doc__) >= 1)
