@@ -1,26 +1,21 @@
 #!/usr/bin/python3
-# gets all states via python yee boi with your own state
+"""
+Lists all values in the states tables of a database where name
+matches the argument
+"""
+import sys
+import MySQLdb
 
+if __name__ == '__main__':
+    db = MySQLdb.connect(user=sys.argv[1], passwd=sys.argv[2],
+                         db=sys.argv[3], port=3306)
 
-def main(args):
-    # gets all state stuff by N
-    if len(args) != 5:
-        raise Exception("need 4 arguments!")
-    db = MySQLdb.connect(host='localhost',
-                         user=args[1],
-                         passwd=args[2],
-                         db=args[3])
     cur = db.cursor()
-    cur.execute(
-        "SELECT * FROM states WHERE name LIKE '{}' ORDER BY id ASC"
-        .format(args[4]))
+    cur.execute("SELECT * \
+    FROM states \
+    WHERE CONVERT(`name` USING Latin1) \
+    COLLATE Latin1_General_CS = '{}';".format(sys.argv[4]))
     states = cur.fetchall()
+
     for state in states:
-        if state[1] == args[4]:
-            print(state)
-
-
-if __name__ == "__main__":
-    import sys
-    import MySQLdb
-    main(sys.argv)
+        print(state)
