@@ -1,20 +1,22 @@
 #!/usr/bin/python3
-# sql alchemy 7
-from sqlalchemy import create_engine
-from sqlalchemy import MetaData
-from sqlalchemy.orm import sessionmaker
-from model_state import Base, State
+"""
+Adds the State object "Lousiana" to the database hbtn_0e_6_usa
+"""
 import sys
-if __name__ == "__main__":
-    engine = create_engine('mysql+mysqldb://{}:{}@localhost/{}'.format(
-        sys.argv[1], sys.argv[2], sys.argv[3]), pool_pre_ping=True)
-    Base.metadata.create_all(engine)
+from model_state import Base, State
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+
+if __name__ == '__main__':
+    engine = create_engine('mysql+mysqldb://{}:{}@localhost:3306/{}'.
+                           format(sys.argv[1], sys.argv[2], sys.argv[3]),
+                           pool_pre_ping=True)
     Session = sessionmaker(bind=engine)
     session = Session()
-    ls = State(name='Louisiana')
-    session.add(ls)
+
+    newState = State(name='Louisiana')
+    session.add(newState)
     session.commit()
-    state = session.query(State).filter(
-        State.name == 'Louisiana').first()
-    print("{}".format(state.id))
-    session.close()
+
+    print(newState.id)
