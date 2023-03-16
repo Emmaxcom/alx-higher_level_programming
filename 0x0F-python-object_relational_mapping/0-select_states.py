@@ -1,23 +1,17 @@
 #!/usr/bin/python3
-# gets all states via python yee boi
+"""
+Lists all states from the database hbtn_0e_0_usa
+"""
+import sys
+import MySQLdb
 
+if __name__ == '__main__':
+    db = MySQLdb.connect(user=sys.argv[1], passwd=sys.argv[2],
+                         db=sys.argv[3], port=3306)
 
-def main(args):
-    # gets all state stuff
-    if len(args) != 4:
-        raise Exception("need 3 arguments!")
-    db = MySQLdb.connect(host='localhost',
-                         user=args[1],
-                         passwd=args[2],
-                         db=args[3])
     cur = db.cursor()
-    cur.execute("SELECT * FROM states ORDER BY id ASC")
+    cur.execute("SELECT * FROM states;")
     states = cur.fetchall()
+
     for state in states:
         print(state)
-
-
-if __name__ == "__main__":
-    import sys
-    import MySQLdb
-    main(sys.argv)
